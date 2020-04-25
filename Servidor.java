@@ -4,19 +4,20 @@ import java.net.*;
 public class Servidor {
 
     private static ServerSocket serverSocket;
+    private static CyclicBarrier barreraDatos;
 
     public static void main(String[] args) {
         try {
             int puerto = 0;
             serverSocket = new ServerSocket(puerto);
             ExecutorService conexiones = Executors.newCachedThreadPool();
-
+            barreraDatos = new CyclicBarrier(10);
             System.out.println("Servidor encendido.");
 
             while (true) {
                 try {
                     Socket socket = serverSocket.accept();
-                    Hilo conexion = new Hilo(socket);
+                    Hilo conexion = new Hilo(socket, barreraDatos);
                     conexiones.execute(conexion);
                 } catch (Exception e) {
                     System.out.println("No se ha podido conectar con el cliente o se ha desconectado.");

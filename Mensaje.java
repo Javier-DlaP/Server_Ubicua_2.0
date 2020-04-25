@@ -1,5 +1,6 @@
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
+import java.util.concurrent.CyclicBarrier;
 import java.time.*;
 
 public class Mensaje {
@@ -9,8 +10,9 @@ public class Mensaje {
     private Datos datos;
     private boolean actualizarSiempre;
     private int posArrayHora;
+    private CyclicBarrier barreraDatos;
 
-    public Mensaje(String mensaje, Datos datos, boolean actualizarSiempre) throws NoSuchElementException{
+    public Mensaje(String mensaje, Datos datos, boolean actualizarSiempre, CyclicBarrier barreraDatos) throws NoSuchElementException{
         final StringTokenizer st = new StringTokenizer(mensaje, ",");
         id = Integer.valueOf(st.nextToken());
         ldr = Float.valueOf(st.nextToken());
@@ -18,6 +20,7 @@ public class Mensaje {
         this.datos = datos;
         this.actualizarSiempre = actualizarSiempre;
         getPosArrayHora();
+        this.barreraDatos = barreraDatos;
     }
 
     private void getPosArrayHora(){
@@ -28,13 +31,13 @@ public class Mensaje {
     }
 
     public String enviarArduino(){
-        datos.anadirDato(posArrayHora, id, ldr, movement);
-        float luz;
+        float light;
         if(actualizarSiempre){
-            luz = datos.actualizarSiempre(id, ldr, movement);
+            light = datos.actualizarSiempre(id, ldr, movement, barreraDatos);
         }else{
-            luz = datos.actualizar(posArrayHora, id, ldr, movement);
+            light = datos.actualizar(posArrayHora, id, ldr, movement);
         }
-        return Float.toString(luz);
+        datos.anadirDato(posArrayHora, id, light, movement);
+        return Float.toString(light);
     }
 }

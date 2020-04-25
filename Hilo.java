@@ -1,13 +1,16 @@
 import java.net.*;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.CyclicBarrier;
 
 public class Hilo implements Runnable {
 
     private Socket socket;
+    private CyclicBarrier barreraDatos;
 
-    public Hilo(Socket socket) {
+    public Hilo(Socket socket, CyclicBarrier barreraDatos) {
         this.socket = socket;
+        this.barreraDatos = barreraDatos;
     }
 
     public void run() {
@@ -18,7 +21,7 @@ public class Hilo implements Runnable {
 
             switch (entrada.readLine()) {
                 case "arduino":
-                    Mensaje mensaje = new Mensaje();
+                    Mensaje mensaje = new Mensaje(barreraDatos);
                     while (true) {
 
                     }
