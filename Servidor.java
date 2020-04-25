@@ -3,10 +3,12 @@ import java.net.*;
 
 public class Servidor {
 
+    private static ServerSocket serverSocket;
+
     public static void main(String[] args) {
         try {
             int puerto = 0;
-            ServerSocket serverSocket = new ServerSocket(puerto);
+            serverSocket = new ServerSocket(puerto);
             ExecutorService conexiones = Executors.newCachedThreadPool();
 
             System.out.println("Servidor encendido.");
@@ -22,6 +24,9 @@ public class Servidor {
             }
         } catch (Exception ex) {
             System.out.println("Conexión inválida.");
+            try {
+                serverSocket.close();
+            } catch (Exception e) {}
         }
     }
 }

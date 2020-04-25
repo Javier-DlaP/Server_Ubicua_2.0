@@ -14,6 +14,7 @@ public class Hilo implements Runnable {
         try {
             BufferedReader entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             BufferedWriter salida = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            Database conexionBBDD = new Database();
 
             switch (entrada.readLine()) {
                 case "arduino":
