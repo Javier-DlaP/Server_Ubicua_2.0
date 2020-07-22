@@ -1,3 +1,4 @@
+package Ubicua;
 
 public class HiloDatos extends Thread {
     String funcion;

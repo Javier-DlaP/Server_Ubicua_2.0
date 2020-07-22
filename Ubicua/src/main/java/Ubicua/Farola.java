@@ -1,3 +1,5 @@
+package Ubicua;
+
 import java.util.*;
 
 public class Farola {

@@ -1,3 +1,5 @@
+package Ubicua;
+
 import java.util.*;
 import java.util.concurrent.*;
 import java.math.*;
@@ -55,6 +57,7 @@ public class Datos {
         return 0.1f; //Sin hacer
     }
 
+    // revisar por el synchronized
     private synchronized void setZeroArraylight(int id){
         arraylight[id] = 0;
     }
