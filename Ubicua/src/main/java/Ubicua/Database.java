@@ -23,6 +23,73 @@ public class Database {
         }
     }
 
+    public String selectFechasHistorico(int idFarola) throws SQLException, ParseException {
+        Statement statement = conexion.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM public.\"DataHistoric\" where id_streetlight = " + idFarola);
+
+        Date fechaMin;
+        Date fechaMax;
+
+        resultSet.next();
+
+        fechaMin = resultSet.getDate("date");
+        fechaMax = resultSet.getDate("date");
+
+        while (resultSet.next()) {
+            if (compararFechas(resultSet.getDate("date"), fechaMin) < 0) {
+                fechaMin = resultSet.getDate("date");
+            } else if (compararFechas(resultSet.getDate("date"), fechaMax) > 0) {
+                fechaMax = resultSet.getDate("date");
+            }
+        }
+
+        return ";" + fechaMin.toString() + ";" + fechaMax.toString() + ";";
+    }
+
+    public String selectDatosMedia(int idFarola) throws SQLException {
+        String resultado = "";
+        Statement statement = conexion.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM public.\"DataAverage\" where id_streetlight = " + idFarola);
+
+        resultSet.next();
+
+        for (int i = 0; i < 24; i++) {
+            if (i < 10) {
+                resultado += ";" + resultSet.getFloat("sensor_0" + i + "_00") + ";" + resultSet.getFloat("light_0" + i + "_00") + ";" + resultSet.getFloat("sensor_0" + i + "_30") + ";" + resultSet.getFloat("light_0" + i + "_30");
+            } else {
+                resultado += ";" + resultSet.getFloat("sensor_" + i + "_00") + ";" + resultSet.getFloat("light_" + i + "_00") + ";" + resultSet.getFloat("sensor_" + i + "_30") + ";" + resultSet.getFloat("light_" + i + "_30");
+            }
+        }
+
+        return resultado + ";";
+    }
+
+    public String selectDatosFecha(int idFarola, Date fecha) throws SQLException {
+        String resultado = "";
+        Statement statement = conexion.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM public.\"DataHistoric\" where id_streetlight = " + idFarola + " and date = \'" + fecha + "\'");
+
+        resultSet.next();
+
+        for (int i = 0; i < 24; i++) {
+            if (i < 10) {
+                resultado += ";" + resultSet.getFloat("sensor_0" + i + "_00") + ";" + resultSet.getFloat("light_0" + i + "_00") + ";" + resultSet.getFloat("sensor_0" + i + "_30") + ";" + resultSet.getFloat("light_0" + i + "_30");
+            } else {
+                resultado += ";" + resultSet.getFloat("sensor_" + i + "_00") + ";" + resultSet.getFloat("light_" + i + "_00") + ";" + resultSet.getFloat("sensor_" + i + "_30") + ";" + resultSet.getFloat("light_" + i + "_30");
+            }
+        }
+
+        return resultado + ";";
+    }
+
+    private int compararFechas(Date fecha1, Date fecha2) throws ParseException {
+        SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd");
+        Date d1 = sdformat.parse(fecha1.toString());
+        Date d2 = sdformat.parse(fecha2.toString());
+
+        return d1.compareTo(d2);
+    }
+
     /*public void insertarValores(Objeto[] array) {
         for (Objeto streetlight: array) {
             String insert = "insert into \"DataDay\" values (" + streetlight.getId + ", ";
@@ -49,7 +116,7 @@ public class Database {
     /* Pruebas para la conexion con base de datos
     public static void ejemploSelect() {
         try {
-            Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/TIENDA", "postgres", "postgres");
+            Connection connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/street_light_monitoring", "postgres", "postgres");
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM public.\"Tienda\"");
             while (resultSet.next()) {
