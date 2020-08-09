@@ -3,6 +3,7 @@ package Ubicua;
 import java.util.*;
 import java.util.concurrent.*;
 import java.math.*;
+import java.sql.SQLException;
 
 public class Datos {
     private Farola farolas[];
@@ -21,6 +22,7 @@ public class Datos {
     private int margenActivacionLdr = 900; //ldr>900 activacion
     private float activacionCerca = 0.7f;
     private float activacionLejos = 0.4f;
+    private Database database = new Database();
 
     public Datos(){
         farolas = new Farola[n_farolas];
@@ -29,8 +31,39 @@ public class Datos {
         }
     }
 
-    public void anadirDato(int posArrayHora, int id, float light, float movement){
-        farolas[id].anadir(posArrayHora, light, movement);
+    public void anadirDato(int posArrayHora, int id, float movement){
+        farolas[id].anadir(posArrayHora, movement);
+    }
+
+    public void actualizarFarolas(int posArrayHora, int idFarola, int ldr) throws SQLException {
+        if (ldr > margenActivacionLdr) {
+            //Activar
+        } else {
+            Float valorMedia = database.selectDatosMediaLuz(idFarola).get(posArrayHora);
+            
+            Float valorMaximoMatriz = 0F;
+            for (int i = 0; i < n_farolas; i++) {
+                int valorMatriz = matrizAdyacencia[i][idFarola];
+                if (valorMatriz != -1) {
+                    float valorFarolaMatriz = 0F;
+                    switch (valorMatriz) {
+                        // Recoger primero la luz de la farola i en la actualizacion anterior
+                        // Disminuir x valor de valorFarolaMatriz dependiendo del caso
+                        case 0:
+                            break;
+                        case 1:
+                            break;
+                        case 2:
+                            break;
+                        default:
+                            break;
+                    }
+                    if (valorFarolaMatriz > valorMaximoMatriz) valorMaximoMatriz = valorFarolaMatriz;
+                }
+            }
+
+            // Decidir cual de los dos (valorMedia o valorMaximoMatriz) es mayor y almacenarlo en el array de farolas
+        }
     }
 
     public float actualizarSiempre(int id, float ldr, float movement, CyclicBarrier barreraHilo){

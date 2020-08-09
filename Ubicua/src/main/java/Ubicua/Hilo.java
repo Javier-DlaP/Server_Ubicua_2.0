@@ -37,7 +37,7 @@ public class Hilo implements Runnable {
                     ArrayList<Mensaje> farolas = new ArrayList<>();
 
                     while (st2.hasMoreTokens()) {
-                        farolas.add(new Mensaje(st2.nextToken(), datos, barreraDatos));
+                        farolas.add(new Mensaje(st2.nextToken(), datos, barreraDatos, barreraMensajes));
                     }
 
                     for (Mensaje farola: farolas) {
@@ -46,6 +46,8 @@ public class Hilo implements Runnable {
 
                     // Barrera de espera para posteriormente recoger los datos del objeto Datos y enviarselo al arduino + insertar en base de datos
                     barreraMensajes.await();
+
+                    
 
                     break;
                     

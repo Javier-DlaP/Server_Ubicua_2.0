@@ -8,31 +8,36 @@ import java.time.*;
 
 public class Mensaje extends Thread {
     private int id;
-    private float ldr;
+    private int ldr;
     private float movement;
     private Datos datos;
     private boolean actualizarSiempre;
     private int posArrayHora;
     private CyclicBarrier barreraDatos;
+    private CyclicBarrier barreraMensajes;
 
-    public Mensaje(String mensaje, Datos datos, CyclicBarrier barreraDatos) throws NoSuchElementException {
+    public Mensaje(String mensaje, Datos datos, CyclicBarrier barreraDatos, CyclicBarrier barreraMensajes) throws NoSuchElementException {
         final StringTokenizer st = new StringTokenizer(mensaje, ",");
         id = Integer.valueOf(st.nextToken());
         movement = Float.valueOf(st.nextToken());
-        ldr = Float.valueOf(st.nextToken());
+        ldr = Integer.valueOf(st.nextToken());
         this.datos = datos;
         getPosArrayHora();
         this.barreraDatos = barreraDatos;
+        this.barreraMensajes = barreraMensajes;
     }
 
     @Override
     public void run() {
         try {
             // Almacenar datos en el objeto Datos
+            datos.anadirDato(posArrayHora, id, movement);
             
             barreraDatos.await();
 
             // (Llamada funcion de Datos) Comprobar valores con la matriz de adyacencia, de lo que recibe del arduino y base de datos -> (almacenar resultado en Datos)
+
+            barreraMensajes.await();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -52,7 +57,7 @@ public class Mensaje extends Thread {
         }else{
             light = datos.actualizar(posArrayHora, id, ldr, movement);
         }
-        datos.anadirDato(posArrayHora, id, light, movement);
+        //datos.anadirDato(posArrayHora, id, light, movement, ldr);
         return Float.toString(light);
     }
 }

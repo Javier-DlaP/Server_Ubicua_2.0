@@ -82,6 +82,30 @@ public class Database {
         return resultado + ";";
     }
 
+    public ArrayList<Float> selectDatosMediaLuz(int idFarola) throws SQLException {
+        ArrayList<Float> resultado = new ArrayList<>();
+        Statement statement = conexion.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM public.\"DataAverage\" where id_streetlight = " + idFarola);
+
+        resultSet.next();
+
+        for (int i = 0; i < 24; i++) {
+            if (i < 10) {
+                resultado.add(resultSet.getFloat("light_0" + i + "_00"));
+                resultado.add(resultSet.getFloat("light_0" + i + "_30"));
+            } else {
+                resultado.add(resultSet.getFloat("light_" + i + "_00"));
+                resultado.add(resultSet.getFloat("light_" + i + "_30"));
+            }
+        }
+
+        return resultado;
+    }
+
+    /*public String insertDatoFecha(int idFarola, Date fecha) throws SQLException {
+
+    }*/
+
     private int compararFechas(Date fecha1, Date fecha2) throws ParseException {
         SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd");
         Date d1 = sdformat.parse(fecha1.toString());
