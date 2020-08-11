@@ -13,17 +13,15 @@ public class Mensaje extends Thread {
     private Datos datos;
     private boolean actualizarSiempre;
     private int posArrayHora;
-    private CyclicBarrier barreraDatos;
     private CyclicBarrier barreraMensajes;
 
-    public Mensaje(String mensaje, Datos datos, CyclicBarrier barreraDatos, CyclicBarrier barreraMensajes) throws NoSuchElementException {
+    public Mensaje(String mensaje, Datos datos, CyclicBarrier barreraMensajes) throws NoSuchElementException {
         final StringTokenizer st = new StringTokenizer(mensaje, ",");
         id = Integer.valueOf(st.nextToken());
         movement = Float.valueOf(st.nextToken());
         ldr = Integer.valueOf(st.nextToken());
         this.datos = datos;
         getPosArrayHora();
-        this.barreraDatos = barreraDatos;
         this.barreraMensajes = barreraMensajes;
     }
 
@@ -32,8 +30,6 @@ public class Mensaje extends Thread {
         try {
             // Almacenar datos en el objeto Datos
             datos.anadirDato(posArrayHora, id, movement);
-            
-            barreraDatos.await();
 
             // (Llamada funcion de Datos) Comprobar valores con la matriz de adyacencia, de lo que recibe del arduino y base de datos -> (almacenar resultado en Datos)
 
@@ -53,7 +49,7 @@ public class Mensaje extends Thread {
     public String enviarArduino(){
         float light;
         if(actualizarSiempre){
-            light = datos.actualizarSiempre(id, ldr, movement, barreraDatos);
+            light = datos.actualizarSiempre(id, ldr, movement);
         }else{
             light = datos.actualizar(posArrayHora, id, ldr, movement);
         }

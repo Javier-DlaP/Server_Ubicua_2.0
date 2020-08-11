@@ -8,14 +8,11 @@ import java.util.concurrent.CyclicBarrier;
 
 public class Hilo implements Runnable {
     private Socket socket;
-    private CyclicBarrier barreraDatos;
     private CyclicBarrier barreraMensajes;
     private Datos datos;
 
-    public Hilo(Socket socket, CyclicBarrier barreraDatos, CyclicBarrier barreraMensajes, Datos datos) {
+    public Hilo(Socket socket, Datos datos) {
         this.socket = socket;
-        this.barreraDatos = barreraDatos;
-        this.barreraMensajes = barreraMensajes;
         this.datos = datos;
     }
 
@@ -37,9 +34,9 @@ public class Hilo implements Runnable {
                     ArrayList<Mensaje> farolas = new ArrayList<>();
 
                     while (st2.hasMoreTokens()) {
-                        farolas.add(new Mensaje(st2.nextToken(), datos, barreraDatos, barreraMensajes));
+                        farolas.add(new Mensaje(st2.nextToken(), datos, barreraMensajes));
                     }
-
+                    barreraMensajes = new CyclicBarrier(1+farolas.size()); //x = nº arduino || nº ard + nº farolas
                     for (Mensaje farola: farolas) {
                         farola.start();
                     }

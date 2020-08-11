@@ -18,7 +18,7 @@ public class Datos {
                                         {-1,-1,2,-1,1,-1,1,1,0,-1},
                                         {-1,-1,1,-1,2,-1,1,-1,-1,0}};
     private int n_farolas = matrizAdyacencia.length;
-    private float arraylight[] = new float[n_farolas];
+    private float arraylight[] = new float[n_farolas]; //intensidades de farolas del dia
     private int margenActivacionLdr = 900; //ldr>900 activacion
     private float activacionCerca = 0.7f;
     private float activacionLejos = 0.4f;
@@ -66,14 +66,12 @@ public class Datos {
         }
     }
 
-    public float actualizarSiempre(int id, float ldr, float movement, CyclicBarrier barreraHilo){
+    public float actualizarSiempre(int id, float ldr, float movement){
         try{
             setZeroArraylight(id); //Se pone a 0 el elemento de arraylight indicado para fijar a 0 todas sus posiciones
-            barreraHilo.await();
             if(movement==1){
                 modifyArraylight(id);
             }
-            barreraHilo.await();
             if(ldr>margenActivacionLdr){
                 return getArraylight()[id];
             }else{
