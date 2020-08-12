@@ -23,6 +23,7 @@ public class Datos {
     private float activacionCerca = 0.7f;
     private float activacionLejos = 0.4f;
     private Database database = new Database();
+    private int idHora = 0;
 
     public Datos(){
         farolas = new Farola[n_farolas];
@@ -31,8 +32,12 @@ public class Datos {
         }
     }
 
+    public synchronized void cambiarIdHora() {
+
+    }
+
     public void anadirDato(int posArrayHora, int id, float movement){
-        farolas[id].anadir(posArrayHora, movement);
+        //farolas[id].anadir(posArrayHora, movement);
     }
 
     public void actualizarFarolas(int posArrayHora, int idFarola, int ldr) throws SQLException {
