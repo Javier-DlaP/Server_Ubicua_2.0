@@ -36,6 +36,15 @@ public class Datos {
         }
     }
 
+    public Farola[] getFarolas() {
+        lock_medias.lock();
+        lock_intensidad.lock();
+        Farola[] farolas = this.farolas;
+        lock_medias.unlock();
+        lock_intensidad.unlock();
+        return farolas;
+    }
+
     public synchronized int getIdHora(){
         return idHora;
     }

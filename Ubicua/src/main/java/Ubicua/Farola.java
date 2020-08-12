@@ -22,6 +22,18 @@ public class Farola {
         this.id = id;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public float[] getLuces() {
+        return luces;
+    }
+
+    public float[] getSensores() {
+        return sensores;
+    }
+
     public void anadir(int posArrayHora, int movement, int ldr){
         aux_luces.add(ldr);
         aux_sensores.add(movement);

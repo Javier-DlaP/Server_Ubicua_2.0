@@ -102,9 +102,31 @@ public class Database {
         return resultado;
     }
 
-    /*public String insertDatoFecha(int idFarola, Date fecha) throws SQLException {
+    public void insertDatosFecha(Farola farola) throws SQLException {
+        Calendar cal = Calendar.getInstance();
+        Date fecha = cal.getTime();
+        DateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd");
+        String fechaFinal = sdformat.format(fecha);
+        String query = "INSERT INTO public.\"DataDay\" VALUES(";
 
-    }*/
+        query += farola.getId() + ", ";
+        query += "' " + fechaFinal + "', ";
+
+        for (int i = 0; i < 48; i++) {
+            query += Math.round(farola.getSensores()[i]*10000)/10000 + ", ";
+            query += Math.round(farola.getLuces()[i]*10000)/10000;
+            if (i != 47) query += ", ";
+        }
+
+        query += ")";
+
+        PreparedStatement statement = conexion.prepareStatement(query);
+        int affectedrows = 0;
+
+        affectedrows = statement.executeUpdate();
+
+        System.out.println(affectedrows);
+    }
 
     private int compararFechas(Date fecha1, Date fecha2) throws ParseException {
         SimpleDateFormat sdformat = new SimpleDateFormat("yyyy-MM-dd");

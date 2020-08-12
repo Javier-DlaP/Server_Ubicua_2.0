@@ -7,6 +7,7 @@ public class HiloHora extends Thread {
     private int anterior_hora;
     private boolean _23_30 = false;
     private boolean _00_00 = false;
+    private Database database = new Database();
 
     public HiloHora(Datos datos) {
         this.datos = datos;
@@ -29,12 +30,15 @@ public class HiloHora extends Thread {
                     if(idHora == 47){
                         //Generar intensidades del dia siguente
                     }else if(idHora == 0){
-                        //Guardar datos en la base de datos
+                        Farola[] farolas = datos.getFarolas();
+                        for (int i = 0; i < farolas.length; i++) {
+                            database.insertDatosFecha(farolas[i]);
+                        }
                     }
                 }
                 Thread.sleep(30000);  // Se ejecuta cada medio minuto
             }
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
