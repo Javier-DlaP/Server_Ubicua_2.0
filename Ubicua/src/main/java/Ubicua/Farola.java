@@ -10,6 +10,7 @@ public class Farola {
     private float sensores[];
     private int id;
     private int ldr;
+    private int intensidad[] = new int[48]; //intensidades del día para la farola
 
     public Farola(int id){
         aux_luces = new ArrayList[48];
@@ -35,5 +36,13 @@ public class Farola {
 
     public void cambiarLuz(int posArrayHora, float light) {
         luces[posArrayHora] = light;
+    }
+
+    public void setIntensidad(int[] intensidad){
+        this.intensidad = intensidad;
+    }
+
+    public int[] getIntensidad(){
+        return intensidad;
     }
 }

@@ -18,8 +18,8 @@ public class Datos {
                                         {-1,-1,2,-1,1,-1,1,1,0,-1},
                                         {-1,-1,1,-1,2,-1,1,-1,-1,0}};
     private int n_farolas = matrizAdyacencia.length;
-    private float arraylight[] = new float[n_farolas]; //intensidades de farolas del dia
-    private int margenActivacionLdr = 900; //ldr>900 activacion
+    private int temp_23_30[] = new int[n_farolas]; //valor de intensidad temporal
+    private int margenActivacionLdr = 500; //ldr>900 activacion
     private float activacionCerca = 0.7f;
     private float activacionLejos = 0.4f;
     private Database database = new Database();
@@ -36,8 +36,8 @@ public class Datos {
     }
 
     public void actualizarFarolas(int posArrayHora, int idFarola, int ldr) throws SQLException {
-        if (ldr > margenActivacionLdr) {
-            //Activar
+        if (ldr < margenActivacionLdr) {
+            //Desactivar
         } else {
             Float valorMedia = database.selectDatosMediaLuz(idFarola).get(posArrayHora);
             
