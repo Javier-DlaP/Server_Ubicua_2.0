@@ -10,7 +10,7 @@ public class Farola {
     private float sensores[];
     private int id;
     private int ldr;
-    private int intensidad[] = new int[48]; //intensidades del día para la farola
+    private int intensidades[] = new int[48]; //intensidades del día para la farola
 
     public Farola(int id){
         aux_luces = new ArrayList<>();
@@ -22,9 +22,7 @@ public class Farola {
         this.id = id;
     }
 
-    public void anadir(int posArrayHora, int movement, int ldr, boolean hacerMedia){
-        if (hacerMedia) calcularMedias(posArrayHora);
-        
+    public void anadir(int posArrayHora, int movement, int ldr){
         aux_luces.add(ldr);
         aux_sensores.add(movement);
     }
@@ -33,12 +31,12 @@ public class Farola {
         luces[posArrayHora] = light;
     }
 
-    public void setIntensidad(int[] intensidad){
-        this.intensidad = intensidad;
+    public void setIntensidad(int pos, int intensidad){
+        intensidades[pos] = intensidad;
     }
 
-    public int[] getIntensidad(){
-        return intensidad;
+    public int[] getIntensidades(){
+        return intensidades;
     }
 
     public void calcularMedias(int pos) {
@@ -52,5 +50,7 @@ public class Farola {
 
         luces[pos] = sumaAuxLuces / aux_luces.size();
         sensores[pos] = sumaAuxSensores / aux_sensores.size();
+        aux_luces = new ArrayList<>();
+        aux_sensores = new ArrayList<>();
     }
 }

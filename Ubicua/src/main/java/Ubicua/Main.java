@@ -15,7 +15,7 @@ public class Main {
             ExecutorService conexiones = Executors.newCachedThreadPool();
             datos = new Datos();
             System.out.println("Servidor encendido.");
-
+            new HiloHora(datos).start();
             while (true) {
                 try {
                     Socket socket = serverSocket.accept();

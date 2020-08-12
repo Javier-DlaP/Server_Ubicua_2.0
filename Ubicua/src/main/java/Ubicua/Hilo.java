@@ -16,6 +16,17 @@ public class Hilo implements Runnable {
         this.datos = datos;
     }
 
+    private String enviarArduino(){
+        float light;
+        if(actualizarSiempre){
+            light = datos.actualizarSiempre(id, ldr, movement);
+        }else{
+            light = datos.actualizar(posArrayHora, id, ldr, movement);
+        }
+        //datos.anadirDato(posArrayHora, id, light, movement, ldr);
+        return Float.toString(light);
+    }
+
     public void run() {
         try {
             BufferedReader entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -46,8 +57,6 @@ public class Hilo implements Runnable {
 
                         // Barrera de espera para posteriormente recoger los datos del objeto Datos y enviarselo al arduino + insertar en base de datos
                         barreraMensajes.await();
-
-                        
 
                         break;
                         
