@@ -16,15 +16,14 @@ public class Hilo implements Runnable {
         this.datos = datos;
     }
 
-    private String enviarArduino(){
-        float light;
-        if(actualizarSiempre){
-            light = datos.actualizarSiempre(id, ldr, movement);
-        }else{
-            light = datos.actualizar(posArrayHora, id, ldr, movement);
+    private String mensajeAEnviarArduino(ArrayList<Integer> ids){
+        String mensaje = "";
+        for (int i = 0; i < ids.size(); i++) {
+            mensaje += datos.getIntensidad(i, datos.getIdHora());
+            
+            if (i != ids.size() - 1) mensaje += ",";
         }
-        //datos.anadirDato(posArrayHora, id, light, movement, ldr);
-        return Float.toString(light);
+        return mensaje;
     }
 
     public void run() {
@@ -46,17 +45,26 @@ public class Hilo implements Runnable {
                     case "ARD":
                         StringTokenizer st2 = new StringTokenizer(interiorMensaje, ";");
                         ArrayList<Mensaje> farolas = new ArrayList<>();
+                        ArrayList<Integer> ids = new ArrayList<>();
 
                         while (st2.hasMoreTokens()) {
-                            farolas.add(new Mensaje(st2.nextToken(), datos, barreraMensajes));
+                            String aux = st2.nextToken();
+                            farolas.add(new Mensaje(aux, datos, barreraMensajes));
+
+                            StringTokenizer st3 = new StringTokenizer(aux, ",");
+                            ids.add(Integer.parseInt(st3.nextToken()));
                         }
                         barreraMensajes = new CyclicBarrier(1+farolas.size()); //x = nº arduino || nº ard + nº farolas
                         for (Mensaje farola: farolas) {
                             farola.start();
                         }
 
-                        // Barrera de espera para posteriormente recoger los datos del objeto Datos y enviarselo al arduino + insertar en base de datos
+                        // Barrera de espera para posteriormente recoger los datos del objeto Datos y enviarselo al arduino
                         barreraMensajes.await();
+
+                        salida.write(mensajeAEnviarArduino(ids));
+                        salida.newLine();
+                        salida.flush();
 
                         break;
                         
