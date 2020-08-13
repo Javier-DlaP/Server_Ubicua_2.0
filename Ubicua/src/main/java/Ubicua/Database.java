@@ -102,6 +102,26 @@ public class Database {
         return resultado;
     }
 
+    public ArrayList<Float> selectDatosMediaSensor(int idFarola) throws SQLException {
+        ArrayList<Float> resultado = new ArrayList<>();
+        Statement statement = conexion.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM public.\"DataAverage\" where id_streetlight = " + idFarola);
+
+        resultSet.next();
+
+        for (int i = 0; i < 24; i++) {
+            if (i < 10) {
+                resultado.add(resultSet.getFloat("sensor_0" + i + "_00"));
+                resultado.add(resultSet.getFloat("sensor_0" + i + "_30"));
+            } else {
+                resultado.add(resultSet.getFloat("sensor_" + i + "_00"));
+                resultado.add(resultSet.getFloat("sensor_" + i + "_30"));
+            }
+        }
+
+        return resultado;
+    }
+
     public void insertDatosFecha(Farola farola) throws SQLException {
         Calendar cal = Calendar.getInstance();
         Date fecha = cal.getTime();
