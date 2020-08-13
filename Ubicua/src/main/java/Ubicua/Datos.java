@@ -31,6 +31,7 @@ public class Datos {
     private ReentrantLock lock_intensidad = new ReentrantLock();
     private ReentrantLock lock_medias = new ReentrantLock();
     private ReentrantLock lock_intensidad_temporal = new ReentrantLock();
+    private ReentrantLock lock_idHora = new ReentrantLock();
     private boolean useAverage = true; // Modo de funcionamiento del sistema de alumbrado inteligente
 
     public Datos() {
@@ -143,15 +144,20 @@ public class Datos {
         return farolas;
     }
 
-    public synchronized int getIdHora(){
-        return idHora;
+    public int getIdHora(){
+        lock_idHora.lock();
+        int aux = idHora;
+        lock_idHora.unlock();
+        return aux;
     }
 
-    public synchronized void cambiarIdHora() {
+    public void cambiarIdHora() {
+        lock_idHora.lock();
         LocalDateTime now = LocalDateTime.now();
         int hora = now.getHour();
         int minuto = now.getMinute();
         idHora = hora*2 + minuto/30;
+        lock_idHora.unlock();
     }
 
     public void anadirDato(int posArrayHora, int id, int movement, int ldr){
