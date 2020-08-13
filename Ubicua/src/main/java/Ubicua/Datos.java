@@ -1,29 +1,28 @@
 package Ubicua;
 
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.io.File;
 import java.io.FileWriter;
-import java.math.*;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 public class Datos {
     private Farola farolas[];
-    private int matrizAdyacencia[][] = {{0,1,1,2,2,-1,-1,1,-1,-1},
-                                        {1,0,-1,-1,-1,1,2,-1,-1,-1},
-                                        {1,-1,0,1,-1,2,-1,-1,2,1},
-                                        {2,-1,1,0,2,-1,1,-1,-1,-1},
-                                        {2,-1,-1,2,0,-1,-1,-1,1,2},
-                                        {-1,1,2,-1,-1,0,2,1,-1,-1},
-                                        {-1,2,-1,1,-1,2,0,-1,1,1},
-                                        {1,-1,-1,-1,-1,1,-1,0,1,-1},
-                                        {-1,-1,2,-1,1,-1,1,1,0,-1},
-                                        {-1,-1,1,-1,2,-1,1,-1,-1,0}};
+    private int matrizAdyacencia[][] = {{ 0, 1, 1, 2, 2, -1, -1, 1, -1, -1 },
+                                        { 1, 0, -1, -1, -1, 1, 2, -1, -1, -1 },
+                                        { 1, -1, 0, 1, -1, 2, -1, -1, 2, 1 },
+                                        { 2, -1, 1, 0, 2, -1, 1, -1, -1, -1 },
+                                        { 2, -1, -1, 2, 0, -1, -1, -1, 1, 2 },
+                                        { -1, 1, 2, -1, -1, 0, 2, 1, -1, -1 },
+                                        { -1, 2, -1, 1, -1, 2, 0, -1, 1, 1 },
+                                        { 1, -1, -1, -1, -1, 1, -1, 0, 1, -1 },
+                                        { -1, -1, 2, -1, 1, -1, 1, 1, 0, -1 },
+                                        { -1, -1, 1, -1, 2, -1, 1, -1, -1, 0 } };
     private int n_farolas = matrizAdyacencia.length;
-    private int temp_23_30[] = new int[n_farolas]; //valor de intensidad temporal
-    private int margenActivacionLdr = 500; //ldr>500 activacion
+    private int temp_23_30[] = new int[n_farolas]; // valor de intensidad temporal
+    private int margenActivacionLdr = 500; // ldr>500 activacion
     private float activacionBaja = 0.1f;
     private float activacionMedia = 0.2f;
     private float activacionAlta = 0.3f;
@@ -31,16 +30,33 @@ public class Datos {
     private int idHora = 0;
     private ReentrantLock lock_intensidad = new ReentrantLock();
     private ReentrantLock lock_medias = new ReentrantLock();
-    private boolean useAverage = true; //Modo de funcionamiento del sistema de alumbrado inteligente
+    private ReentrantLock lock_intensidad_temporal = new ReentrantLock();
+    private boolean useAverage = true; // Modo de funcionamiento del sistema de alumbrado inteligente
 
-    public Datos(){
+    public Datos() {
         farolas = new Farola[n_farolas];
-        for (int i=0; i<n_farolas; i++){
+        for (int i = 0; i < n_farolas; i++) {
             farolas[i] = new Farola(i);
         }
     }
 
-    public int[][] generaIntensidadesFarolas() throws SQLException {
+    public void guardarTemporalIntensidades(){
+        lock_intensidad_temporal.lock();
+        for(int i=0; i<n_farolas; i++){
+            temp_23_30[i] = getIntensidad(i, 47);
+        }
+        lock_intensidad_temporal.lock();
+    }
+
+    public void guardaIntensidades(int[][] intensidades){
+        for(int i=0; i<n_farolas; i++){
+            for(int j=0; j<48; j++){
+                setIntensidad(i, j, intensidades[i][j]);
+            }
+        }
+    }
+
+    public int[][] generaIntensidadesFarolas() throws SQLException, IOException, InterruptedException {
         int intensidades[][] = new int[n_farolas][48];
         float sensores[][] = new float[n_farolas][48];
         float luz[][] = new float[n_farolas][48];
@@ -72,20 +88,15 @@ public class Datos {
                 Thread.sleep(5000); //Se esperan 5 segundos al tardar como mucho 4 segundos en ejecutarse
                 //Lee el archivo de salida de la red neuronal
                 ArrayList<Float> numeros = new ArrayList<Float>();
-                try {
-                    File file = new File("C:\\Users\\javir\\predictions_streetlights.txt");
-        
-                    Scanner sc = new Scanner(file);
-                    while (sc.hasNextLine()) {
-                        String[] lista = sc.nextLine().split(",");
-                        for (String numero: lista) {
-                            numeros.add(Float.parseFloat(numero));
-                        }
+                File file = new File("C:\\Users\\javir\\predictions_streetlights.txt");
+                Scanner sc = new Scanner(file);
+                while (sc.hasNextLine()) {
+                    String[] lista = sc.nextLine().split(",");
+                    for (String numero: lista) {
+                        numeros.add(Float.parseFloat(numero));
                     }
-                    sc.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+                sc.close();
                 ArrayList<Float> aux_luz = database.selectDatosMediaLuz(i);
                 for(int j=0; j<48; j++){
                     luz[i][j] = aux_luz.get(j);
@@ -93,7 +104,33 @@ public class Datos {
                 }
             }
         }
-        //CONTINUAR
+        for(int j=0; j<48; j++){
+            for(int i=0; i<n_farolas; i++){ //Elige la intesidad en función del movimiento previsto
+                if(sensores[i][j]<activacionBaja){
+                    intensidades[i][j] = 0;
+                }else if(sensores[i][j]<activacionMedia){
+                    intensidades[i][j] = 1;
+                }else if(sensores[i][j]<activacionAlta){
+                    intensidades[i][j] = 2;
+                }else{
+                    intensidades[i][j] = 3;
+                }
+            }
+            for(int i=0; i<n_farolas; i++){ //Apaga las farolas donde se prevea luz
+                if(luz[i][j]<margenActivacionLdr){
+                    intensidades[i][j] = 0;
+                }
+            }
+            for(int i=0; i<n_farolas; i++){ //Suaviza la diferencia en intensidad entre farolas
+                for(int k=0; k<n_farolas; k++){
+                    if(matrizAdyacencia[i][k] == 1){
+                        intensidades[k][j] = Math.max(intensidades[i][j]-1, intensidades[k][j]);
+                    }else if(matrizAdyacencia[i][k] == 2){
+                        intensidades[k][j] = Math.max(intensidades[i][j]-2, intensidades[k][j]);
+                    }
+                }
+            }
+        }
         return intensidades;
     }
 
@@ -143,44 +180,15 @@ public class Datos {
         return x;
     }
 
-    public void setIntensidad(int idFarola, int posArrayHora, int new_intensidad){
+    private void setIntensidad(int idFarola, int posArrayHora, int new_intensidad){
+        lock_intensidad_temporal.lock();
         lock_intensidad.lock();
         if(posArrayHora == 47){
             temp_23_30[idFarola] = farolas[idFarola].getIntensidades()[47];
         }
         farolas[idFarola].setIntensidad(posArrayHora, new_intensidad);
         lock_intensidad.unlock();
-    }
-
-    public void actualizarFarolas(int posArrayHora, int idFarola, int ldr) throws SQLException { //Ver si hay que borrar
-        if (ldr < margenActivacionLdr) {
-            //Desactivar
-        } else {
-            Float valorMedia = database.selectDatosMediaLuz(idFarola).get(posArrayHora);
-            
-            Float valorMaximoMatriz = 0F;
-            for (int i = 0; i < n_farolas; i++) {
-                int valorMatriz = matrizAdyacencia[i][idFarola];
-                if (valorMatriz != -1) {
-                    float valorFarolaMatriz = 0F;
-                    switch (valorMatriz) {
-                        // Recoger primero la luz de la farola i en la actualizacion anterior
-                        // Disminuir x valor de valorFarolaMatriz dependiendo del caso
-                        case 0:
-                            break;
-                        case 1:
-                            break;
-                        case 2:
-                            break;
-                        default:
-                            break;
-                    }
-                    if (valorFarolaMatriz > valorMaximoMatriz) valorMaximoMatriz = valorFarolaMatriz;
-                }
-            }
-
-            // Decidir cual de los dos (valorMedia o valorMaximoMatriz) es mayor y almacenarlo en el array de farolas
-        }
+        lock_intensidad_temporal.unlock();
     }
 
     public synchronized int[][] getMatrizAdyacencia(){

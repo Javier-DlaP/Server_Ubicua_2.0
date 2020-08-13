@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 public class HiloHora extends Thread {
     private Datos datos;
     private int anterior_hora;
-    private boolean _23_30 = false;
-    private boolean _00_00 = false;
     private Database database = new Database();
 
     public HiloHora(Datos datos) {
@@ -29,7 +27,8 @@ public class HiloHora extends Thread {
                     datos.calcularMedias(idHora);
                     if(idHora == 47){
                         //Guardar en temporal las intensidades de las 23:30
-                        //Generar intensidades del dia siguente
+                        int intensidades[][] = datos.generaIntensidadesFarolas();
+                        datos.guardaIntensidades(intensidades);
                     }else if(idHora == 0){
                         Farola[] farolas = datos.getFarolas();
                         for (int i = 0; i < farolas.length; i++) {

@@ -2,8 +2,6 @@ package Ubicua;
 
 import java.sql.*;
 import java.util.*;
-import java.time.*;
-import java.time.format.*;
 import java.text.*;
 import java.util.Date;
 

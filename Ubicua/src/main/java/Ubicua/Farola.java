@@ -3,13 +3,11 @@ package Ubicua;
 import java.util.*;
 
 public class Farola {
-    private int posArrayHoraActual = -1;
     private ArrayList<Float> aux_luces;
     private ArrayList<Integer> aux_sensores;
     private float luces[];
     private float sensores[];
     private int id;
-    private int ldr;
     private int intensidades[] = new int[48]; //intensidades del día para la farola
 
     public Farola(int id){

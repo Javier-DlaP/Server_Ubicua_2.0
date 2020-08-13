@@ -3,7 +3,6 @@ package Ubicua;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.concurrent.CyclicBarrier;
-import java.time.*;
 
 
 public class Mensaje extends Thread {
@@ -11,7 +10,6 @@ public class Mensaje extends Thread {
     private int ldr;
     private int movement;
     private Datos datos;
-    private boolean actualizarSiempre;
     private int posArrayHora;
     private CyclicBarrier barreraMensajes;
 
