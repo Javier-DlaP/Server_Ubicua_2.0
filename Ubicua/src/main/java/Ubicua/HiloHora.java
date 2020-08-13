@@ -28,6 +28,7 @@ public class HiloHora extends Thread {
                 if(idHora != anterior_hora){
                     datos.calcularMedias(idHora);
                     if(idHora == 47){
+                        //Guardar en temporal las intensidades de las 23:30
                         //Generar intensidades del dia siguente
                     }else if(idHora == 0){
                         Farola[] farolas = datos.getFarolas();

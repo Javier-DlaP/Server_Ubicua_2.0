@@ -3,6 +3,8 @@ package Ubicua;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
+import java.io.File;
+import java.io.FileWriter;
 import java.math.*;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -22,18 +24,77 @@ public class Datos {
     private int n_farolas = matrizAdyacencia.length;
     private int temp_23_30[] = new int[n_farolas]; //valor de intensidad temporal
     private int margenActivacionLdr = 500; //ldr>500 activacion
-    private float activacionCerca = 0.7f;
-    private float activacionLejos = 0.4f;
+    private float activacionBaja = 0.1f;
+    private float activacionMedia = 0.2f;
+    private float activacionAlta = 0.3f;
     private Database database = new Database();
     private int idHora = 0;
     private ReentrantLock lock_intensidad = new ReentrantLock();
     private ReentrantLock lock_medias = new ReentrantLock();
+    private boolean useAverage = true; //Modo de funcionamiento del sistema de alumbrado inteligente
 
     public Datos(){
         farolas = new Farola[n_farolas];
         for (int i=0; i<n_farolas; i++){
             farolas[i] = new Farola(i);
         }
+    }
+
+    public int[][] generaIntensidadesFarolas() throws SQLException {
+        int intensidades[][] = new int[n_farolas][48];
+        float sensores[][] = new float[n_farolas][48];
+        float luz[][] = new float[n_farolas][48];
+        if(useAverage){ //Usa la media de valores del mes anterior
+            for(int i=0; i<n_farolas; i++){
+                ArrayList<Float> aux_luz = database.selectDatosMediaLuz(i);
+                ArrayList<Float> aux_sensor = database.selectDatosMediaSensor(i);
+                for(int j=0; j<48; j++){
+                    sensores[i][j] = aux_sensor.get(j);
+                    luz[i][j] = aux_luz.get(j);
+                }
+            }
+        }else{ //Usa la predicción realizada por la IA
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DATE, 1); //Se guarda la fecha del dia siguiente
+            Date fecha = cal.getTime();
+            int dia = fecha.getDate();
+            int mes = fecha.getMonth();
+            int dia_semana = fecha.getDay();
+            for(int i=0; i<n_farolas; i++){
+                //Escribe en el CSV la informacion del dia del que se quiere la informacion
+                FileWriter writer = new FileWriter("C:\\Users\\javir\\data_streetlights_input.csv");
+                writer.append("id_streetlight,day,month,week_day\n");
+                writer.append(String.valueOf(i)+","+String.valueOf(dia)+","+String.valueOf(mes)+","+String.valueOf(dia_semana)+"\n");
+                writer.flush();
+                writer.close();
+                //Ejecuta la IA
+                Runtime.getRuntime().exec("cd C:\\Users\\javir & activate fastai & python usetabulardatastreetlighting.py");
+                Thread.sleep(5000); //Se esperan 5 segundos al tardar como mucho 4 segundos en ejecutarse
+                //Lee el archivo de salida de la red neuronal
+                ArrayList<Float> numeros = new ArrayList<Float>();
+                try {
+                    File file = new File("C:\\Users\\javir\\predictions_streetlights.txt");
+        
+                    Scanner sc = new Scanner(file);
+                    while (sc.hasNextLine()) {
+                        String[] lista = sc.nextLine().split(",");
+                        for (String numero: lista) {
+                            numeros.add(Float.parseFloat(numero));
+                        }
+                    }
+                    sc.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ArrayList<Float> aux_luz = database.selectDatosMediaLuz(i);
+                for(int j=0; j<48; j++){
+                    luz[i][j] = aux_luz.get(j);
+                    sensores[i][j] = numeros.get(j);
+                }
+            }
+        }
+        //CONTINUAR
+        return intensidades;
     }
 
     public Farola[] getFarolas() {

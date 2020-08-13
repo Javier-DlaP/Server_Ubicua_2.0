@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Farola {
     private int posArrayHoraActual = -1;
-    private ArrayList<Integer> aux_luces;
+    private ArrayList<Float> aux_luces;
     private ArrayList<Integer> aux_sensores;
     private float luces[];
     private float sensores[];
@@ -35,7 +35,7 @@ public class Farola {
     }
 
     public void anadir(int posArrayHora, int movement, int ldr){
-        aux_luces.add(ldr);
+        aux_luces.add((((float) ldr)+(100/899))/(1/899)); //Pasa de valores entre 100-999 a 0-1 siguiendo una distribución lineal
         aux_sensores.add(movement);
     }
 
