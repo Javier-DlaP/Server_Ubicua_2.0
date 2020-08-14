@@ -33,8 +33,21 @@ public class Farola {
     }
 
     public void anadir(int posArrayHora, int movement, int ldr){
-        aux_luces.add((((float) ldr)+(100/899))/(1/899)); //Pasa de valores entre 100-999 a 0-1 siguiendo una distribución lineal
+        aux_luces.add((((float) ldr)*(1f/899f))-(100f/899f)); //Pasa de valores entre 100-999 a 0-1 siguiendo una distribución lineal
         aux_sensores.add(movement);
+
+        /* NO BORRAR
+        System.out.print("LDR: ");
+        for (int i = 0; i < aux_luces.size(); i++) {
+            System.out.print(aux_luces.get(i) + ",");
+        }
+        System.out.println();
+
+        System.out.print("Movimiento: ");
+        for (int i = 0; i < aux_sensores.size(); i++) {
+            System.out.print(aux_sensores.get(i) + ",");
+        }
+        System.out.println();*/
     }
 
     public void cambiarLuz(int posArrayHora, float light) {

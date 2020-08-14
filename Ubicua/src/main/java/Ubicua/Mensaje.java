@@ -21,6 +21,8 @@ public class Mensaje extends Thread {
         this.datos = datos;
         posArrayHora = datos.getIdHora();
         this.barreraMensajes = barreraMensajes;
+
+        //System.out.println(id + "," + movement + "," + ldr);
     }
 
     @Override

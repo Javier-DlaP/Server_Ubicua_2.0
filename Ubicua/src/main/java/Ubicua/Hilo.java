@@ -19,7 +19,7 @@ public class Hilo implements Runnable {
     private String mensajeAEnviarArduino(ArrayList<Integer> ids){
         String mensaje = "";
         for (int i = 0; i < ids.size(); i++) {
-            mensaje += datos.getIntensidad(i, datos.getIdHora());
+            mensaje += datos.getIntensidad(ids.get(i), datos.getIdHora());
             
             if (i != ids.size() - 1) mensaje += ",";
         }

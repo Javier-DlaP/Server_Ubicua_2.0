@@ -143,7 +143,8 @@ public class Database {
 
         affectedrows = statement.executeUpdate();
 
-        System.out.println(affectedrows);
+        if (affectedrows == 1) System.out.println("Se ha guardado en la base de datos.");
+        else System.out.println("Error al guardar en la base de datos");
     }
 
     private int compararFechas(Date fecha1, Date fecha2) throws ParseException {

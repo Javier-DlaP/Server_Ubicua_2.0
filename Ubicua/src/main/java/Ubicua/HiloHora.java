@@ -12,14 +12,16 @@ public class HiloHora extends Thread {
         LocalDateTime now = LocalDateTime.now();
         int hora = now.getHour();
         int minuto = now.getMinute();
-        int idHora = hora * 2 + minuto / 30;
+        //int idHora = hora * 2 + minuto / 30;
+        int idHora = datos.getIdHora();
         anterior_hora = idHora;
     }
 
     public void verIntesidadesActuales(){
         System.out.println(((int)datos.getIdHora()/2)+":"+(datos.getIdHora()%2)*30);
         for(int i=0; i<datos.getNFarolas(); i++){
-            System.out.print(datos.getIntensidad(i, datos.getIdHora())+",");
+            System.out.print(datos.getIntensidad(i, datos.getIdHora()));
+            if (i != datos.getNFarolas() - 1) System.out.print(",");
         }
         System.out.println();
     }
@@ -30,11 +32,12 @@ public class HiloHora extends Thread {
                 LocalDateTime now = LocalDateTime.now();
                 int hora = now.getHour();
                 int minuto = now.getMinute();
-                int idHora = hora * 2 + minuto / 30;
+                //int idHora = hora * 2 + minuto / 30;
+                int idHora = datos.getIdHora();
                 if(idHora != anterior_hora){
                     datos.calcularMedias(idHora);
                     if(idHora == 47){
-                        //Guardar en temporal las intensidades de las 23:30
+                        datos.guardarTemporalIntensidades();
                         int intensidades[][] = datos.generaIntensidadesFarolas();
                         datos.guardaIntensidades(intensidades);
                     }else if(idHora == 0){
@@ -44,8 +47,9 @@ public class HiloHora extends Thread {
                         }
                     }
                 }
-                Thread.sleep(30000);  // Se ejecuta cada medio minuto
+
                 verIntesidadesActuales();
+                Thread.sleep(5000);  // Se ejecuta cada medio minuto
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -22,10 +22,10 @@ public class Datos {
                                         { -1, -1, 1, -1, 2, -1, 1, -1, -1, 0 } };
     private int n_farolas = matrizAdyacencia.length;
     private int temp_23_30[] = new int[n_farolas]; // valor de intensidad temporal
-    private int margenActivacionLdr = 500; // ldr>500 activacion
-    private float activacionBaja = 0.1f;
-    private float activacionMedia = 0.2f;
-    private float activacionAlta = 0.3f;
+    private float margenActivacionLdr = 0.5f; // ldr>500 activacion
+    private float activacionBaja = 0.05f;
+    private float activacionMedia = 0.08f;
+    private float activacionAlta = 0.12f;
     private Database database = new Database();
     private int idHora = 0;
     private ReentrantLock lock_intensidad = new ReentrantLock();
@@ -39,6 +39,14 @@ public class Datos {
         farolas = new Farola[n_farolas];
         for (int i = 0; i < n_farolas; i++) {
             farolas[i] = new Farola(i);
+        }
+
+        cambiarIdHora();
+        try {
+            int intensidades[][] = generaIntensidadesFarolas();
+            guardaIntensidades(intensidades);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -123,6 +131,19 @@ public class Datos {
                 }
             }
         }
+
+        /*for (int z = 0; z < n_farolas; z++) {
+            System.out.print(sensores[z][getIdHora()]);
+        }
+
+        System.out.println();
+
+        for (int z = 0; z < n_farolas; z++) {
+            System.out.print(luz[z][getIdHora()]);
+        }
+
+        System.out.println();*/
+
         for(int j=0; j<48; j++){
             for(int i=0; i<n_farolas; i++){ //Elige la intesidad en función del movimiento previsto
                 if(sensores[i][j]<activacionBaja){
@@ -136,7 +157,7 @@ public class Datos {
                 }
             }
             for(int i=0; i<n_farolas; i++){ //Apaga las farolas donde se prevea luz
-                if(luz[i][j]<margenActivacionLdr){
+                if(luz[i][j]>margenActivacionLdr){
                     intensidades[i][j] = 0;
                 }
             }
@@ -150,6 +171,13 @@ public class Datos {
                 }
             }
         }
+
+        /*for (int i = 0; i < n_farolas; i++) {
+            System.out.print(intensidades[i][getIdHora()]);
+        }
+
+        System.out.println();*/
+
         return intensidades;
     }
 
@@ -175,7 +203,7 @@ public class Datos {
         int hora = now.getHour();
         int minuto = now.getMinute();
         //idHora = hora*2 + minuto/30;
-        idHora = 20;
+        idHora = 0;
         lock_idHora.unlock();
     }
 
