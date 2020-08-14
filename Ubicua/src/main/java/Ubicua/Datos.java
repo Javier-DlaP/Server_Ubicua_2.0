@@ -156,7 +156,8 @@ public class Datos {
         LocalDateTime now = LocalDateTime.now();
         int hora = now.getHour();
         int minuto = now.getMinute();
-        idHora = hora*2 + minuto/30;
+        //idHora = hora*2 + minuto/30;
+        idHora = 20;
         lock_idHora.unlock();
     }
 

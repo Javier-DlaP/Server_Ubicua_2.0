@@ -47,6 +47,8 @@ public class Hilo implements Runnable {
                         ArrayList<Mensaje> farolas = new ArrayList<>();
                         ArrayList<Integer> ids = new ArrayList<>();
 
+                        barreraMensajes = new CyclicBarrier(1+st2.countTokens()); //x = nº arduino || nº ard + nº farolas
+                        
                         while (st2.hasMoreTokens()) {
                             String aux = st2.nextToken();
                             farolas.add(new Mensaje(aux, datos, barreraMensajes));
@@ -54,7 +56,7 @@ public class Hilo implements Runnable {
                             StringTokenizer st3 = new StringTokenizer(aux, ",");
                             ids.add(Integer.parseInt(st3.nextToken()));
                         }
-                        barreraMensajes = new CyclicBarrier(1+farolas.size()); //x = nº arduino || nº ard + nº farolas
+                        
                         for (Mensaje farola: farolas) {
                             farola.start();
                         }
