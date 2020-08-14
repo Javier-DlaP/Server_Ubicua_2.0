@@ -32,6 +32,7 @@ public class Datos {
     private ReentrantLock lock_medias = new ReentrantLock();
     private ReentrantLock lock_intensidad_temporal = new ReentrantLock();
     private ReentrantLock lock_idHora = new ReentrantLock();
+    private ReentrantLock lock_useAverage = new ReentrantLock();
     private boolean useAverage = true; // Modo de funcionamiento del sistema de alumbrado inteligente
 
     public Datos() {
@@ -39,6 +40,23 @@ public class Datos {
         for (int i = 0; i < n_farolas; i++) {
             farolas[i] = new Farola(i);
         }
+    }
+
+    public synchronized int getNFarolas(){
+        return n_farolas;
+    }
+
+    public void setUseAverage(boolean bool){
+        lock_useAverage.lock();
+        useAverage = bool;
+        lock_useAverage.unlock();
+    }
+
+    public boolean getUseAverage(){
+        lock_useAverage.lock();
+        boolean aux = useAverage;
+        lock_useAverage.unlock();
+        return aux;
     }
 
     public void guardarTemporalIntensidades(){
@@ -61,7 +79,7 @@ public class Datos {
         int intensidades[][] = new int[n_farolas][48];
         float sensores[][] = new float[n_farolas][48];
         float luz[][] = new float[n_farolas][48];
-        if(useAverage){ //Usa la media de valores del mes anterior
+        if(getUseAverage()){ //Usa la media de valores del mes anterior
             for(int i=0; i<n_farolas; i++){
                 ArrayList<Float> aux_luz = database.selectDatosMediaLuz(i);
                 ArrayList<Float> aux_sensor = database.selectDatosMediaSensor(i);

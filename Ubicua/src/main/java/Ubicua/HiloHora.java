@@ -16,6 +16,14 @@ public class HiloHora extends Thread {
         anterior_hora = idHora;
     }
 
+    public void verIntesidadesActuales(){
+        System.out.println(((int)datos.getIdHora()/2)+":"+(datos.getIdHora()%2)*30);
+        for(int i=0; i<datos.getNFarolas(); i++){
+            System.out.print(datos.getIntensidad(i, datos.getIdHora())+",");
+        }
+        System.out.println();
+    }
+
     public void run() {
         try {
             while(true){
@@ -37,6 +45,7 @@ public class HiloHora extends Thread {
                     }
                 }
                 Thread.sleep(30000);  // Se ejecuta cada medio minuto
+                verIntesidadesActuales();
             }
         } catch (Exception e) {
             e.printStackTrace();
