@@ -30,7 +30,6 @@ public class Hilo implements Runnable {
         try {
             BufferedReader entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             BufferedWriter salida = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            Database conexionBBDD = new Database();
 
             boolean esApp = false;
 
@@ -81,8 +80,28 @@ public class Hilo implements Runnable {
                                 salida.write("conectado;");
                                 salida.newLine();
                                 salida.flush();
-
-                                // Implementar bucle para que la conexion se quede abierta y envie el estado actual de las farolas a la aplicacion
+                                break;
+                            case "obtener modo funcionamiento":
+                                salida.write(Boolean.toString(datos.getUseAverage()) + ";");
+                                salida.newLine();
+                                salida.flush();
+                                break;
+                            case "cambiar modo funcionamiento":
+                                datos.setUseAverage(Boolean.parseBoolean(st3.nextToken()));
+                                salida.write("valor cambiado;");
+                                salida.newLine();
+                                salida.flush();
+                                break;
+                            case "recibir farolas":
+                                int n_farolas = datos.getNFarolas();
+                                String mensaje = "farolas;";
+                                for (int i = 0; i < n_farolas; i++) {
+                                    mensaje += i + "," + datos.getFarolas()[i].getIntensidades()[datos.getIdHora()] + ",";
+                                    if (i != n_farolas - 1) mensaje += ";";
+                                }
+                                salida.write(mensaje);
+                                salida.newLine();
+                                salida.flush();
                                 break;
                             case "recibir fechas farola":
                                 int idFarola = Integer.parseInt(st3.nextToken());

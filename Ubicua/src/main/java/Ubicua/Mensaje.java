@@ -4,7 +4,6 @@ import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.concurrent.CyclicBarrier;
 
-
 public class Mensaje extends Thread {
     private int id;
     private int ldr;
