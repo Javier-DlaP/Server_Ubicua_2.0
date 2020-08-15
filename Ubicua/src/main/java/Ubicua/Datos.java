@@ -34,6 +34,7 @@ public class Datos {
     private ReentrantLock lock_idHora = new ReentrantLock();
     private ReentrantLock lock_useAverage = new ReentrantLock();
     private boolean useAverage = true; // Modo de funcionamiento del sistema de alumbrado inteligente
+    private boolean iniciarIA = true;
 
     public Datos() {
         farolas = new Farola[n_farolas];
@@ -98,20 +99,25 @@ public class Datos {
             }
         }else{ //Usa la predicción realizada por la IA
             Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.DATE, 1); //Se guarda la fecha del dia siguiente
+            if(!iniciarIA){
+                cal.add(Calendar.DATE, 1); //Se guarda la fecha del dia siguiente
+            }else{
+                iniciarIA = false;
+            }
             Date fecha = cal.getTime();
             int dia = fecha.getDate();
-            int mes = fecha.getMonth();
+            int mes = fecha.getMonth() + 1;
             int dia_semana = fecha.getDay();
             for(int i=0; i<n_farolas; i++){
                 //Escribe en el CSV la informacion del dia del que se quiere la informacion
+                System.out.println("Prediciendo el movimiento de la farola "+i);
                 FileWriter writer = new FileWriter("C:\\Users\\javir\\data_streetlights_input.csv");
                 writer.append("id_streetlight,day,month,week_day\n");
                 writer.append(String.valueOf(i)+","+String.valueOf(dia)+","+String.valueOf(mes)+","+String.valueOf(dia_semana)+"\n");
                 writer.flush();
                 writer.close();
                 //Ejecuta la IA
-                Runtime.getRuntime().exec("cd C:\\Users\\javir & activate fastai & python usetabulardatastreetlighting.py");
+                Runtime.getRuntime().exec("cmd.exe /c cd C:\\Users\\javir & activate fastai & python usetabulardatastreetlighting.py");
                 Thread.sleep(5000); //Se esperan 5 segundos al tardar como mucho 4 segundos en ejecutarse
                 //Lee el archivo de salida de la red neuronal
                 ArrayList<Float> numeros = new ArrayList<Float>();
@@ -132,12 +138,14 @@ public class Datos {
             }
         }
 
-        /*for (int z = 0; z < n_farolas; z++) {
-            System.out.print(sensores[z][getIdHora()]);
+        /*
+        for(int a=0; a<n_farolas; a++){
+            for (int z = 0; z < n_farolas; z++) {
+                System.out.print(sensores[z][a]);
+            }
+            System.out.println();
         }
-
-        System.out.println();
-
+        
         for (int z = 0; z < n_farolas; z++) {
             System.out.print(luz[z][getIdHora()]);
         }
